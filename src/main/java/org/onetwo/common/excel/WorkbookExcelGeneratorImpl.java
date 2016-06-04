@@ -36,7 +36,7 @@ public class WorkbookExcelGeneratorImpl extends AbstractWorkbookExcelGenerator {
 		this.workbookData.getWorkbookListener().afterCreateWorkbook(getWorkbook());
 		int total = 0;
 		for(TemplateModel template : workbookData.getWorkbookModel().getSheets()){
-			PoiExcelGenerator pg = DefaultExcelGeneratorFactory.createExcelGenerator(workbookData, template);
+			PoiExcelGenerator pg = ExcelGenerators.createExcelGenerator(workbookData, template);
 			total += pg.generateIt();
 		}
 		return total;

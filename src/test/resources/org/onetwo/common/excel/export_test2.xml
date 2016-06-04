@@ -11,7 +11,7 @@
 				<field name="id" label="主键"/>
 				<field name="cardNo" label="卡号" />
 				<field name="cardPwd" label="密码"/>
-				<field name="#f.format(startTime, 'yy:MM:dd')" label="开始时间"/>
+				<field name="#f.formatDate(startTime, 'yy:MM:dd')" label="开始时间"/>
 			</fields>
 		</row>
 		<row name="element" type="iterator" datasource="#data" renderHeader="true" fieldHeaderFont="boldweight:BOLDWEIGHT_BOLD;color:COLOR_RED"> 
@@ -19,7 +19,7 @@
 				<field name="id" label="主键"/>
 				<field name="cardNo" label="卡号" />
 				<field name="cardPwd" label="密码" />
-				<field name="#f.format(startTime, 'yy:MM:dd')" label="开始时间"/>
+				<field name="#f.formatDate(startTime, 'yy:MM:dd')" label="开始时间"/>
 			</fields>
 		</row>
 	</rows>

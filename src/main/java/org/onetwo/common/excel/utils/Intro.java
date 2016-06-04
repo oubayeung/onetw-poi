@@ -61,7 +61,7 @@ public class Intro<T> {
 	
 	private Map<String, PropertyDescriptor> loadPropertyDescriptors(){
 		if(clazz==Object.class || clazz.isInterface() || clazz.isPrimitive())
-			return Collections.EMPTY_MAP;
+			return Collections.emptyMap();
 		BeanInfo beanInfo = null;
 		try {
 			beanInfo = Introspector.getBeanInfo(clazz, Object.class);
@@ -128,7 +128,7 @@ public class Intro<T> {
 				return ;
 
 			if(clazz==Object.class || clazz.isPrimitive()){
-				_fieldMaps = Collections.EMPTY_MAP;
+				_fieldMaps = Collections.emptyMap();
 				return ;
 			}
 			Field[] fields = clazz.getDeclaredFields();
@@ -363,7 +363,7 @@ public class Intro<T> {
 		return classes;
 	}
 
-	public static List<Method> findPublicMethods(Class objClass, String name, Class... paramTypes) {
+	public static List<Method> findPublicMethods(Class<?> objClass, String name, Class<?>... paramTypes) {
 		Assert.notNull(objClass, "objClass must not be null");
 		Assert.notNull(name, "Method name must not be null");
 		List<Method> methodList = new ArrayList<Method>();
@@ -381,7 +381,7 @@ public class Intro<T> {
 		return methodList;
 	}
 	
-	public static Method findPublicMethod(Class objClass, String name, Class... paramTypes) {
+	public static Method findPublicMethod(Class<?> objClass, String name, Class<?>... paramTypes) {
 		try {
 			return findPublicMethods(objClass, name, paramTypes).get(0);
 		} catch (IndexOutOfBoundsException e) {
@@ -389,11 +389,11 @@ public class Intro<T> {
 		}
 	}
 	
-	public static boolean matchParameterTypes(Class[] sourceTypes, Class[] targetTypes) {
+	public static boolean matchParameterTypes(Class<?>[] sourceTypes, Class<?>[] targetTypes) {
 		if (sourceTypes.length != targetTypes.length)
 			return false;
 		int index = 0;
-		for (Class cls : targetTypes) {
+		for (Class<?> cls : targetTypes) {
 			if (!cls.isAssignableFrom(sourceTypes[index]))
 				return false;
 			index++;

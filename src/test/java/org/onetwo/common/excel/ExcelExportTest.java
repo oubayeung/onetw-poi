@@ -65,16 +65,16 @@ public class ExcelExportTest {
 	@Test
 	public void testExport() {
 		String path = ExcelUtils.getResourcePath("org/onetwo/common/excel/export_test.xls");
-//		PoiExcelGenerator g = ExcelGeneratorFactory.createExcelGenerator("org/onetwo/common/excel/export_test.xml", context);
-		TemplateGenerator g = DefaultExcelGeneratorFactory.createExcelGenerator("org/onetwo/common/excel/export_test.xml", context);
+		TemplateGenerator g = ExcelGenerators.createExcelGenerator("org/onetwo/common/excel/export_test.xml", context);
 		g.write(path);
 	}
 
 	@Test
 	public void testExport2() {
-//		System.out.println("style:"+ReflectUtils.getStaticFieldValue(CellStyle.class, "ALIGN_LEFT"));
+		ExcelGenerators.devModel();
 		String path = ExcelUtils.getResourcePath("org/onetwo/common/excel/export_test2.xls");
-		TemplateGenerator g = DefaultExcelGeneratorFactory.createExcelGenerator("org/onetwo/common/excel/export_test2.xml", context);
+		System.out.println("path:"+path);
+		TemplateGenerator g = ExcelGenerators.createExcelGenerator("org/onetwo/common/excel/export_test2.xml", context);
 		g.write(path);
 	}
 

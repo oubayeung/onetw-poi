@@ -33,6 +33,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.onetwo.common.excel.DefaultPropertyStringParser;
+import org.onetwo.common.excel.ExcelGenerators;
 import org.onetwo.common.excel.ExecutorModel;
 import org.onetwo.common.excel.FieldModel;
 import org.onetwo.common.excel.PoiModel;
@@ -66,7 +67,7 @@ abstract public class ExcelUtils {
 	public static final PropertyStringParser DEFAULT_PROPERTY_STRING_PARSER = new DefaultPropertyStringParser();
 	
 	private static final List<Class<?>> BASE_CLASS;
-	private static final List<Class<?>> SIMPLE_CLASS;
+//	private static final List<Class<?>> SIMPLE_CLASS;
 
 	static {
 		
@@ -95,7 +96,7 @@ abstract public class ExcelUtils {
 		simples.add(Calendar.class);
 		simples.add(Number.class);
 		
-		SIMPLE_CLASS = Collections.unmodifiableList(simples);
+//		SIMPLE_CLASS = Collections.unmodifiableList(simples);
 	}
 
 	public static List<Class<?>> getBaseTypeClass(){
@@ -161,22 +162,23 @@ abstract public class ExcelUtils {
 		return xstream;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static <T> T readTemplate(Resource config){
 		XStream xstream = registerExcelModel();
 		
-		Object template = null;
+		T template = null;
 		try {
 			
 			if(config.exists()){
-				template = xstream.fromXML(new FileInputStream(config.getFile()));
+				template = (T)xstream.fromXML(new FileInputStream(config.getFile()));
 			}else{
-				template = xstream.fromXML(config.getInputStream());
+				template = (T)xstream.fromXML(config.getInputStream());
 			}
 		} catch (Exception e) {
 			throw wrapAsUnCheckedException("读取模板["+config+"]配置出错：" + e.getMessage(), e);
 		} 
 		
-		return (T)template;
+		return template;
 	}
 	
 	public static void setCellValue(Cell cell, Object value){
@@ -255,7 +257,7 @@ abstract public class ExcelUtils {
 		return rowValues;
 	}
 
-	public static Map mapRow(Row row, List<String> names){
+	public static Map<String, Object> mapRow(Row row, List<String> names){
 		int cellCount = row.getPhysicalNumberOfCells();
 		
 		Cell cell = null;
@@ -272,13 +274,14 @@ abstract public class ExcelUtils {
 		return rowValue;
 	}
 
-	public static Object getValue(String exp, Map context, Object root){
+	public static Object getValue(String exp, Map<?, ?> context, Object root){
 		Object value = null;
 		try {
 			value = Ognl.getValue(exp, context==null?Collections.EMPTY_MAP:context, root);
 		} catch (Exception e) {
-//			logger.info("["+exp+"] getValue error : " + e.getMessage(), e);
-			logger.info("["+exp+"] getValue error : " + e.getMessage());
+			if(ExcelGenerators.isDevModel()){
+				logger.warn("["+exp+"] getValue error : " + e.getMessage());
+			}
 		}
 		return value;
 	}
@@ -308,7 +311,9 @@ abstract public class ExcelUtils {
 			return cell==null?null:cell.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator().evaluate(cell);
 		} catch (Exception e) {
 //			throw new BaseException("get formual cell value["+cell.getRowIndex()+", "+ cell.getColumnIndex()+"] error : " + e.getMessage(), e);
-			logger.warn("get formual cell value["+cell.getRowIndex()+", "+ cell.getColumnIndex()+"] error : " + e.getMessage());
+			if(ExcelGenerators.isDevModel()){
+				logger.warn("get formual cell value["+cell.getRowIndex()+", "+ cell.getColumnIndex()+"] error : " + e.getMessage());
+			}
 			return null;
 		}
 	}
@@ -476,9 +481,10 @@ abstract public class ExcelUtils {
 	
 
 	public static <T> List<T> tolist(Object object) {
-		return tolist(object, Collections.EMPTY_LIST);
+		return tolist(object, Collections.emptyList());
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static <T> List<T> tolist(Object object, List<T> def) {
 		if (object == null)
 			return def;
@@ -522,7 +528,7 @@ abstract public class ExcelUtils {
 		return (col==null || col.isEmpty());
 	}
 
-	public static boolean isEmpty(Map map){
+	public static boolean isEmpty(Map<?, ?> map){
 		return map==null || map.isEmpty();
 	}
 	
@@ -541,6 +547,7 @@ abstract public class ExcelUtils {
 	}
 	
 
+	@SuppressWarnings("unchecked")
 	public static <K, V> Map<K, V> asMap(Object... arrays){
 		 return Stream.iterate(0, i->i+2)
 				 .limit(arrays.length/2)
@@ -600,7 +607,7 @@ abstract public class ExcelUtils {
 		return !isBlank(str);
 	}
 	
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static Iterator convertIterator(Object value) {
         Iterator iterator;
 
@@ -650,11 +657,11 @@ abstract public class ExcelUtils {
 		if(obj==null)
 			return 0;
 		if(obj instanceof Collection){
-			return ((Collection)obj).size();
+			return ((Collection<?>)obj).size();
 		}else if(obj instanceof CharSequence){
 			return ((CharSequence)obj).length();
 		}else if(obj instanceof Map){
-			return ((Map)obj).size();
+			return ((Map<?, ?>)obj).size();
 		}else if(obj.getClass().isArray()){
 			return Array.getLength(obj);
 		}
@@ -666,7 +673,7 @@ abstract public class ExcelUtils {
 			return false;
 		if(obj instanceof Iterable){
 //			return !isEmpty((Collection)obj);
-			Iterator<?> it = ((Iterable)obj).iterator();
+			Iterator<?> it = ((Iterable<?>)obj).iterator();
 			return it.hasNext();
 		}else if(obj.getClass().isArray()){
 			return !isEmpty((Object[])obj);
@@ -679,7 +686,7 @@ abstract public class ExcelUtils {
 	}
 
 	public static <T> List<T> emptyIfNull(List<T> list){
-		return list==null?Collections.EMPTY_LIST:list;
+		return list==null?Collections.emptyList():list;
 	}
 	
 	public static String getResourcePath(String path){
